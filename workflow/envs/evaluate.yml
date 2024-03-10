@@ -1,0 +1,14 @@
+name: evaluate
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - pytorch==2.2.1
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=11.8
+  - numpy
+  - pip:
+    - tqdm

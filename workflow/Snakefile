@@ -1,0 +1,43 @@
+
+model_names = ["resnet18", "resnet34", "resnet50", "resnet101", "resnet152"]
+
+rule all:
+    input:
+        "results/llm/llm_main.svg",
+        "results/imagenet/imagenet_ranks_spearman.svg"
+
+rule evaluate_model:
+    input:
+        "data/imagenet/raw_data/ILSVRC2012_img_val.tar"
+    output:
+        "results/imagenet/{model_name}.npy"
+    conda:
+        "envs/evaluate.yml"
+    shell:
+        """
+        python workflow/scripts/evaluate_model.py \
+        --model_name {wildcards.model_name} \
+        --out_path {output} \
+        --data_path {input}
+        """
+
+rule run_llm:
+    output:
+        "results/llm/llm_main.svg"
+    conda:
+        "envs/ppi.yml"
+    script:
+        "scripts/llm_experiment.py"
+
+rule run_imagenet:
+    input:
+        expand(
+            "results/imagenet/{model_name}.npy",
+            model_name=model_names
+        )
+    output:
+        "results/imagenet/imagenet_ranks_spearman.svg"
+    conda:
+        "envs/ppi.yml"
+    script:
+        "scripts/imagenet_experiment.py"
